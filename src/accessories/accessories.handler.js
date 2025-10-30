@@ -338,10 +338,10 @@ class Handler {
     try {
       const cmd = new Command(this.args);
 
-      if (state === this.api.hap.Characteristic.On.OFF) {
-        cmd.setLampMode(Command.constants.LAMP_OFF);
-      } else {
+      if (state) {
         cmd.setLampMode(Command.constants.LAMP_AIR_QUALITY);
+      } else {
+        cmd.setLampMode(Command.constants.LAMP_OFF);
       }
 
       logger.info(`Light state: ${state}`, this.accessory.displayName);
@@ -371,36 +371,23 @@ class Handler {
         4: Command.constants.LAMP_BRIGHTNESS_3,
       }[Math.ceil(value / 25)];
 
-      const args = new Command(this.args).setLampBrightness(brightness).getCommand();
+      const cmd = new Command(this.args).setLampBrightness(brightness);
+
+      if (brightness != Command.constants.LAMP_BRIGHTNESS_0) {
+        cmd.setLampMode(Command.constants.LAMP_AIR_QUALITY);
+      } else {
+        cmd.setLampMode(Command.constants.LAMP_OFF);
+      }
 
       logger.info(`Brightness: ${value}`, this.accessory.displayName);
 
-      await this.sendCMD(args);
+      await this.sendCMD(cmd.getCommand());
     } catch (err) {
       logger.warn('An error occured during changing light brightness!', this.accessory.displayName);
       logger.error(err, this.accessory.displayName);
     }
 
     this.settingBrightess = false;
-  }
-
-  async setLightSaturation(value) {
-    try {
-      const mode = {
-        0: Command.constants.LAMP_AIR_QUALITY,
-        1: Command.constants.LAMP_AIR_QUALITY,
-        2: Command.constants.LAMP_AMBIENT,
-      }[Math.ceil(value / 50)];
-
-      const args = new Command(this.args).setLampMode(mode).getCommand();
-
-      logger.info(`Saturation: ${value}`, this.accessory.displayName);
-
-      await this.sendCMD(args);
-    } catch (err) {
-      logger.warn('An error occured during changing light saturation!', this.accessory.displayName);
-      logger.error(err, this.accessory.displayName);
-    }
   }
 
   //Longpoll Process
@@ -475,15 +462,18 @@ class Handler {
 
       if (this.lightService) {
         if (result.getLampMode() != Result.constants.LAMP_OFF) {
-          this.lightService
-            .updateCharacteristic(this.api.hap.Characteristic.On, true)
-            .updateCharacteristic(this.api.hap.Characteristic.Brightness, result.getLampBrightness())
-            .updateCharacteristic(
-              this.api.hap.Characteristic.Saturation,
-              result.getLampMode() ? result.getLampMode() * 50 : 50
-            );
+          this.lightService.updateCharacteristic(this.api.hap.Characteristic.On, true).updateCharacteristic(
+            this.api.hap.Characteristic.Brightness,
+            {
+              [Result.constants.LAMP_BRIGHTNESS_0]: 0,
+              [Result.constants.LAMP_BRIGHTNESS_1]: 25,
+              [Result.constants.LAMP_BRIGHTNESS_2]: 75,
+              [Result.constants.LAMP_BRIGHTNESS_3]: 100,
+            }[result.getLampBrightness()]
+          );
         } else {
           this.lightService.updateCharacteristic(this.api.hap.Characteristic.On, false);
+          this.lightService.updateCharacteristic(this.api.hap.Characteristic.Brightness, 0);
         }
       }
 

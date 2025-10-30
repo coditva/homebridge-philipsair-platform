@@ -136,10 +136,6 @@ class Accessory {
         this.lightService.addCharacteristic(this.api.hap.Characteristic.Brightness);
       }
 
-      if (!this.lightService.testCharacteristic(this.api.hap.Characteristic.Saturation)) {
-        this.lightService.addCharacteristic(this.api.hap.Characteristic.Saturation);
-      }
-
       this.lightService
         .getCharacteristic(this.api.hap.Characteristic.On)
         .onSet(async (state) => await this.handler.setLightOn(state));
@@ -151,15 +147,6 @@ class Accessory {
           minValue: 0,
           maxValue: 100,
           minStep: 25,
-        });
-
-      this.lightService
-        .getCharacteristic(this.api.hap.Characteristic.Saturation)
-        .onSet(async (value) => await this.handler.setLightSaturation(value))
-        .setProps({
-          minValue: 0,
-          maxValue: 100,
-          minStep: 50,
         });
     } else {
       const service = this.accessory.getService(this.api.hap.Service.Lightbulb);
