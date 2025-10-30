@@ -42,6 +42,11 @@ class Command {
     AIR_QUALITY_GAS: 'D03122',
     HUMIDITY: 'D03125',
     TEMPERATURE: 'D03224',
+
+    PRE_FILTER_STATUS: 'D0520D',
+    PRE_FILTER_LIFE: 'D05207',
+    HEPA_FILTER_STATUS: 'D0540E',
+    HEPA_FILTER_LIFE: 'D05408',
   };
 
   setPower(state) {
@@ -145,6 +150,22 @@ class Result {
 
   getTemperature() {
     return parseInt(this._data[Result.constants.TEMPERATURE]) / 10;
+  }
+
+  getPreFilterStatus() {
+    return parseInt(this._data[Result.constants.PRE_FILTER_STATUS]);
+  }
+
+  getPreFilterLife() {
+    return parseInt(this._data[Result.constants.PRE_FILTER_LIFE]);
+  }
+
+  getHepaFilterStatus() {
+    return parseInt(this._data[Result.constants.HEPA_FILTER_STATUS]);
+  }
+
+  getHepaFilterLife() {
+    return parseInt(this._data[Result.constants.HEPA_FILTER_LIFE]);
   }
 }
 
@@ -414,26 +435,26 @@ class Handler {
       //     this.lightService.updateCharacteristic(this.api.hap.Characteristic.On, false);
       //   }
       // }
-      //
-      // if (this.preFilterService) {
-      //   const fltsts0change = this.obj.fltsts0 == 0;
-      //   const fltsts0maxlife = (this.obj.flttotal0) ? this.obj.flttotal0 : 360
-      //   const fltsts0life = (this.obj.fltsts0 / fltsts0maxlife) * 100;
-      //
-      //   this.preFilterService
-      //     .updateCharacteristic(this.api.hap.Characteristic.FilterChangeIndication, fltsts0change)
-      //     .updateCharacteristic(this.api.hap.Characteristic.FilterLifeLevel, fltsts0life);
-      // }
-      //
-      // if (this.hepaFilterService) {
-      //   const fltsts1change = this.obj.fltsts1 == 0;
-      //   const fltsts1maxlife = (this.obj.flttotal1) ? this.obj.flttotal1 : 4800
-      //   const fltsts1life = (this.obj.fltsts1 / fltsts1maxlife) * 100;
-      //
-      //   this.hepaFilterService
-      //     .updateCharacteristic(this.api.hap.Characteristic.FilterChangeIndication, fltsts1change)
-      //     .updateCharacteristic(this.api.hap.Characteristic.FilterLifeLevel, fltsts1life);
-      // }
+
+      if (this.preFilterService) {
+        const fltsts0change = result.getPreFilterStatus() == 0;
+        const fltsts0maxlife = result.getPreFilterLife() ? result.getPreFilterLife() : 720;
+        const fltsts0life = (result.getPreFilterStatus() / fltsts0maxlife) * 100;
+
+        this.preFilterService
+          .updateCharacteristic(this.api.hap.Characteristic.FilterChangeIndication, fltsts0change)
+          .updateCharacteristic(this.api.hap.Characteristic.FilterLifeLevel, fltsts0life);
+      }
+
+      if (this.hepaFilterService) {
+        const fltsts1change = result.getHepaFilterStatus() == 0;
+        const fltsts1maxlife = result.getHepaFilterLife() ? result.getHepaFilterLife() : 4800;
+        const fltsts1life = (result.getHepaFilterStatus() / fltsts1maxlife) * 100;
+
+        this.hepaFilterService
+          .updateCharacteristic(this.api.hap.Characteristic.FilterChangeIndication, fltsts1change)
+          .updateCharacteristic(this.api.hap.Characteristic.FilterLifeLevel, fltsts1life);
+      }
     });
 
     this.airControl.stderr.on('data', (data) => {
