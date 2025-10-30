@@ -9,7 +9,6 @@ class Accessory {
     this.handler = handler;
 
     this.purifierService = null;
-    this.humidifierService = null;
     this.temperatureService = null;
     this.humidityService = null;
     this.lightService = null;
@@ -61,7 +60,7 @@ class Accessory {
       .setProps({
         minValue: 0,
         maxValue: 100,
-        minStep: this.accessory.context.config.sleepSpeed ? 20 : 25,
+        minStep: 20, // 5 steps: 0, 20, 40, 60, 80, 100
       });
 
     //Service.AirQuality
@@ -92,70 +91,6 @@ class Accessory {
     //Service.FilterMaintenance [HEPA filter]
     if (!this.accessory.getService('HEPA filter')) {
       this.accessory.addService(this.api.hap.Service.FilterMaintenance, 'HEPA filter', 'HEPA filter');
-    }
-
-    //Service.HumidifierDehumidifier
-    if (this.accessory.context.config.humidifier) {
-      this.humidifierService = this.accessory.getService(this.api.hap.Service.HumidifierDehumidifier);
-
-      if (!this.humidifierService) {
-        this.humidifierService = this.accessory.addService(
-          this.api.hap.Service.HumidifierDehumidifier,
-          'Humidifier',
-          'Humidifier'
-        );
-      }
-
-      //Service.FilterMaintenance [Wick filter]
-      if (!this.accessory.getService('Wick filter')) {
-        this.accessory.addService(this.api.hap.Service.FilterMaintenance, 'Wick filter', 'Wick filter');
-      }
-
-      if (!this.humidifierService.testCharacteristic(this.api.hap.Characteristic.RelativeHumidityHumidifierThreshold)) {
-        this.humidifierService.addCharacteristic(this.api.hap.Characteristic.RelativeHumidityHumidifierThreshold);
-      }
-
-      if (!this.humidifierService.testCharacteristic(this.api.hap.Characteristic.WaterLevel)) {
-        this.humidifierService.addCharacteristic(this.api.hap.Characteristic.WaterLevel);
-      }
-
-      this.humidifierService
-        .getCharacteristic(this.api.hap.Characteristic.Active)
-        .onSet(async (state) => await this.handler.setHumidifierActive(state));
-
-      this.humidifierService
-        .getCharacteristic(this.api.hap.Characteristic.CurrentHumidifierDehumidifierState)
-        .setProps({
-          validValues: [
-            this.api.hap.Characteristic.CurrentHumidifierDehumidifierState.INACTIVE,
-            this.api.hap.Characteristic.CurrentHumidifierDehumidifierState.HUMIDIFYING,
-          ],
-        });
-
-      this.humidifierService
-        .getCharacteristic(this.api.hap.Characteristic.TargetHumidifierDehumidifierState)
-        .updateValue(this.api.hap.Characteristic.TargetHumidifierDehumidifierState.HUMIDIFIER)
-        .onSet(async (state) => {
-          await this.handler.setHumidifierActive(state);
-          //await this.handler.setHumidifierTargetState(state);
-        })
-        .setProps({
-          validValues: [this.api.hap.Characteristic.TargetHumidifierDehumidifierState.HUMIDIFIER],
-        });
-
-      this.humidifierService
-        .getCharacteristic(this.api.hap.Characteristic.RelativeHumidityHumidifierThreshold)
-        .onSet(async (state) => await this.handler.setHumidifierTargetState(state))
-        .setProps({
-          minValue: 0,
-          maxValue: 100,
-          minStep: 25,
-        });
-    } else {
-      const service = this.accessory.getService(this.api.hap.Service.HumidifierDehumidifier);
-      if (service) {
-        this.accessory.removeService(service);
-      }
     }
 
     //Service.TemperatureSensor

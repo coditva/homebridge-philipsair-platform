@@ -1,8 +1,8 @@
 {
-  "name": "homebridge-philipsair-platform",
-  "version": "1.0.2",
-  "description": "Homebridge plugin for philips air purifier and humidifier.",
-  "author": "SeydX (https://github.com/SeydX/homebridge-philipsair-platform)",
+  "name": "homebridge-philipsair-platform-ac4000",
+  "version": "0.0.1",
+  "description": "Homebridge plugin for philips air purifier AC4000 series.",
+  "author": "coditva",
   "scripts": {
     "lint": "eslint --fix .",
     "prepublishOnly": "npm i --package-lock-only && npm audit fix && npm run lint"
@@ -22,7 +22,7 @@
     "prettier": "^2.4.1"
   },
   "bugs": {
-    "url": "https://github.com/SeydX/homebridge-philipsair-platform/issues"
+    "url": "https://github.com/coditva/homebridge-philipsair-platform/issues"
   },
   "engines": {
     "node": ">=14.18.0",
@@ -42,7 +42,7 @@
       "url": "https://github.com/sponsors/SeydX"
     }
   ],
-  "homepage": "https://github.com/SeydX/homebridge-philipsair-platform#readme",
+  "homepage": "https://github.com/coditva/homebridge-philipsair-platform#readme",
   "keywords": [
     "philips",
     "homebridge-plugin",
@@ -56,6 +56,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SeydX/homebridge-philipsair-platform.git"
+    "url": "git+https://github.com/coditva/homebridge-philipsair-platform.git"
   }
 }

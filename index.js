@@ -1,4 +1,6 @@
 /**
+ * Forked from:
+ *
  * v1
  *
  * @url https://github.com/SeydX/homebridge-philipsair-platform

@@ -14,7 +14,6 @@ const Config = (deviceConfig) => {
     light: deviceConfig.light || false,
     temperature: deviceConfig.temperature || false,
     humidity: deviceConfig.humidity || false,
-    humidifier: deviceConfig.humidifier || false,
     allergicFunc: deviceConfig.allergicFunc || false,
     sleepSpeed: deviceConfig.sleepSpeed || false,
   };

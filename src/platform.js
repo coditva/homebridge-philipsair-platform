@@ -7,7 +7,7 @@ const { generateConfig } = require('./utils/utils');
 //Accessories
 const { AccessoriesService, AccessoriesSetup, AccessoriesHandler } = require('./accessories');
 
-const PLUGIN_NAME = 'homebridge-philipsair-platform';
+const PLUGIN_NAME = 'homebridge-philipsair-platform-ac4000';
 const PLATFORM_NAME = 'PhilipsAirPlatform';
 
 var Accessory;
