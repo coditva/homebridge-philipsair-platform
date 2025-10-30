@@ -416,7 +416,10 @@ class Handler {
       }
 
       if (this.temperatureService) {
-        this.temperatureService.updateCharacteristic(this.api.hap.Characteristic.CurrentTemperature, this.obj.temp);
+        this.temperatureService.updateCharacteristic(
+          this.api.hap.Characteristic.CurrentTemperature,
+          result.getTemperature()
+        );
       }
 
       if (this.humidityService) {
