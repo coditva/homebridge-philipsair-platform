@@ -83,11 +83,6 @@ class Accessory {
       this.accessory.addService(this.api.hap.Service.FilterMaintenance, 'Pre Filter', 'Pre Filter');
     }
 
-    //Service.FilterMaintenance [Active carbon filter]
-    if (!this.accessory.getService('Active carbon filter')) {
-      this.accessory.addService(this.api.hap.Service.FilterMaintenance, 'Active carbon filter', 'Active carbon filter');
-    }
-
     //Service.FilterMaintenance [HEPA filter]
     if (!this.accessory.getService('HEPA filter')) {
       this.accessory.addService(this.api.hap.Service.FilterMaintenance, 'HEPA filter', 'HEPA filter');
@@ -141,6 +136,10 @@ class Accessory {
         this.lightService.addCharacteristic(this.api.hap.Characteristic.Brightness);
       }
 
+      if (!this.lightService.testCharacteristic(this.api.hap.Characteristic.Saturation)) {
+        this.lightService.addCharacteristic(this.api.hap.Characteristic.Saturation);
+      }
+
       this.lightService
         .getCharacteristic(this.api.hap.Characteristic.On)
         .onSet(async (state) => await this.handler.setLightOn(state));
@@ -152,6 +151,15 @@ class Accessory {
           minValue: 0,
           maxValue: 100,
           minStep: 25,
+        });
+
+      this.lightService
+        .getCharacteristic(this.api.hap.Characteristic.Saturation)
+        .onSet(async (value) => await this.handler.setLightSaturation(value))
+        .setProps({
+          minValue: 0,
+          maxValue: 100,
+          minStep: 50,
         });
     } else {
       const service = this.accessory.getService(this.api.hap.Service.Lightbulb);

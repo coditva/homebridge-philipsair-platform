@@ -47,6 +47,17 @@ class Command {
     PRE_FILTER_LIFE: 'D05207',
     HEPA_FILTER_STATUS: 'D0540E',
     HEPA_FILTER_LIFE: 'D05408',
+
+    LAMP_MODE: 'D03135',
+    LAMP_OFF: 0,
+    LAMP_AIR_QUALITY: 1,
+    LAMP_AMBIENT: 2,
+
+    LAMP_BRIGHTNESS: 'D03105',
+    LAMP_BRIGHTNESS_0: 0, // off
+    LAMP_BRIGHTNESS_1: 115, // low
+    LAMP_BRIGHTNESS_2: 123, // bright
+    LAMP_BRIGHTNESS_3: 101, // auto
   };
 
   setPower(state) {
@@ -84,6 +95,20 @@ class Command {
     }[state];
 
     this._cmds.push(`${Command.constants.FAN_SPEED}=${transformed}`);
+
+    return this;
+  }
+
+  setLampMode(state) {
+    this._isInteger = true;
+    this._cmds.push(`${Command.constants.LAMP_MODE}=${state}`);
+
+    return this;
+  }
+
+  setLampBrightness(state) {
+    this._isInteger = true;
+    this._cmds.push(`${Command.constants.LAMP_BRIGHTNESS}=${state}`);
 
     return this;
   }
@@ -166,6 +191,14 @@ class Result {
 
   getHepaFilterLife() {
     return parseInt(this._data[Result.constants.HEPA_FILTER_LIFE]);
+  }
+
+  getLampMode() {
+    return parseInt(this._data[Result.constants.LAMP_MODE]);
+  }
+
+  getLampBrightness() {
+    return parseInt(this._data[Result.constants.LAMP_BRIGHTNESS]);
   }
 }
 
@@ -303,22 +336,17 @@ class Handler {
     this.settingLightState = true;
 
     try {
-      const values = {
-        aqil: state ? 100 : 0,
-        uil: state ? '1' : '0',
-      };
+      const cmd = new Command(this.args);
 
-      //Light
-      const args1 = [...this.args];
-      const args2 = [...this.args];
-
-      args1.push('set', `aqil=${values.aqil}`, '-I');
-      args2.push('set', `uil=${values.uil}`);
+      if (state === this.api.hap.Characteristic.On.OFF) {
+        cmd.setLampMode(Command.constants.LAMP_OFF);
+      } else {
+        cmd.setLampMode(Command.constants.LAMP_AIR_QUALITY);
+      }
 
       logger.info(`Light state: ${state}`, this.accessory.displayName);
 
-      await this.sendCMD(args1);
-      await this.sendCMD(args2);
+      await this.sendCMD(cmd.getCommand());
     } catch (err) {
       logger.warn('An error occured during changing light state!', this.accessory.displayName);
       logger.error(err, this.accessory.displayName);
@@ -335,28 +363,44 @@ class Handler {
     this.settingBrightess = true;
 
     try {
-      const values = {
-        aqil: value,
-        uil: value ? '1' : '0',
-      };
+      const brightness = {
+        0: Command.constants.LAMP_BRIGHTNESS_0,
+        1: Command.constants.LAMP_BRIGHTNESS_1,
+        2: Command.constants.LAMP_BRIGHTNESS_2,
+        3: Command.constants.LAMP_BRIGHTNESS_3,
+        4: Command.constants.LAMP_BRIGHTNESS_3,
+      }[Math.ceil(value / 25)];
 
-      //Light
-      const args1 = [...this.args];
-      const args2 = [...this.args];
-
-      args1.push('set', `aqil=${values.aqil}`, '-I');
-      args2.push('set', `uil=${values.uil}`);
+      const args = new Command(this.args).setLampBrightness(brightness).getCommand();
 
       logger.info(`Brightness: ${value}`, this.accessory.displayName);
 
-      await this.sendCMD(args1);
-      await this.sendCMD(args2);
+      await this.sendCMD(args);
     } catch (err) {
       logger.warn('An error occured during changing light brightness!', this.accessory.displayName);
       logger.error(err, this.accessory.displayName);
     }
 
     this.settingBrightess = false;
+  }
+
+  async setLightSaturation(value) {
+    try {
+      const mode = {
+        0: Command.constants.LAMP_AIR_QUALITY,
+        1: Command.constants.LAMP_AIR_QUALITY,
+        2: Command.constants.LAMP_AMBIENT,
+      }[Math.ceil(value / 50)];
+
+      const args = new Command(this.args).setLampMode(mode).getCommand();
+
+      logger.info(`Saturation: ${value}`, this.accessory.displayName);
+
+      await this.sendCMD(args);
+    } catch (err) {
+      logger.warn('An error occured during changing light saturation!', this.accessory.displayName);
+      logger.error(err, this.accessory.displayName);
+    }
   }
 
   //Longpoll Process
@@ -429,15 +473,19 @@ class Handler {
         );
       }
 
-      // if (this.lightService) {
-      //   if (this.obj.pwr == '1') {
-      //     this.lightService
-      //       .updateCharacteristic(this.api.hap.Characteristic.On, this.obj.aqil > 0)
-      //       .updateCharacteristic(this.api.hap.Characteristic.Brightness, this.obj.aqil);
-      //   } else {
-      //     this.lightService.updateCharacteristic(this.api.hap.Characteristic.On, false);
-      //   }
-      // }
+      if (this.lightService) {
+        if (result.getLampMode() != Result.constants.LAMP_OFF) {
+          this.lightService
+            .updateCharacteristic(this.api.hap.Characteristic.On, true)
+            .updateCharacteristic(this.api.hap.Characteristic.Brightness, result.getLampBrightness())
+            .updateCharacteristic(
+              this.api.hap.Characteristic.Saturation,
+              result.getLampMode() ? result.getLampMode() * 50 : 50
+            );
+        } else {
+          this.lightService.updateCharacteristic(this.api.hap.Characteristic.On, false);
+        }
+      }
 
       if (this.preFilterService) {
         const fltsts0change = result.getPreFilterStatus() == 0;
