@@ -36,6 +36,12 @@ class Command {
     FAN_SPEED_3: 3, // Medium
     FAN_SPEED_4: 4,
     FAN_SPEED_5: 5, // Turbo
+
+    AIR_QUALITY_IAQL: 'D03120',
+    AIR_QUALITY_PM2_5: 'D03221',
+    AIR_QUALITY_GAS: 'D03122',
+    HUMIDITY: 'D03125',
+    TEMPERATURE: 'D03224',
   };
 
   setPower(state) {
@@ -119,6 +125,26 @@ class Result {
         [Result.constants.MODE_TURBO]: Result.constants.FAN_SPEED_5,
       }[speed] || Result.constants.FAN_SPEED_0
     );
+  }
+
+  getAirQuality() {
+    return Math.ceil(parseInt(this._data[Result.constants.AIR_QUALITY_IAQL] / 3));
+  }
+
+  getPM2_5() {
+    return parseInt(this._data[Result.constants.AIR_QUALITY_PM2_5]);
+  }
+
+  getGas() {
+    return parseInt(this._data[Result.constants.AIR_QUALITY_GAS]);
+  }
+
+  getHumidity() {
+    return parseInt(this._data[Result.constants.HUMIDITY]);
+  }
+
+  getTemperature() {
+    return parseInt(this._data[Result.constants.TEMPERATURE]) / 10;
   }
 }
 
@@ -362,20 +388,20 @@ class Handler {
         )
         .updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, result.getFanSpeed() * 20);
 
-      // if (this.airQualityService) {
-      //   this.airQualityService
-      //     .updateCharacteristic(this.api.hap.Characteristic.AirQuality, Math.ceil(this.obj.iaql / 3))
-      //     .updateCharacteristic(this.api.hap.Characteristic.PM2_5Density, this.obj.pm25);
-      // }
-      //
-      // if (this.temperatureService) {
-      //   this.temperatureService.updateCharacteristic(this.api.hap.Characteristic.CurrentTemperature, this.obj.temp);
-      // }
-      //
-      // if (this.humidityService) {
-      //   this.humidityService.updateCharacteristic(this.api.hap.Characteristic.CurrentRelativeHumidity, this.obj.rh);
-      // }
-      //
+      if (this.airQualityService) {
+        this.airQualityService
+          .updateCharacteristic(this.api.hap.Characteristic.AirQuality, result.getAirQuality())
+          .updateCharacteristic(this.api.hap.Characteristic.PM2_5Density, result.getPM2_5())
+      }
+
+      if (this.temperatureService) {
+        this.temperatureService.updateCharacteristic(this.api.hap.Characteristic.CurrentTemperature, this.obj.temp);
+      }
+
+      if (this.humidityService) {
+        this.humidityService.updateCharacteristic(this.api.hap.Characteristic.CurrentRelativeHumidity, result.getHumidity());
+      }
+
       // if (this.lightService) {
       //   if (this.obj.pwr == '1') {
       //     this.lightService
