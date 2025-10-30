@@ -128,7 +128,7 @@ class Result {
   }
 
   getAirQuality() {
-    return Math.ceil(parseInt(this._data[Result.constants.AIR_QUALITY_IAQL] / 3));
+    return Math.ceil(parseInt(this._data[Result.constants.AIR_QUALITY_IAQL]) / 3);
   }
 
   getPM2_5() {
@@ -391,7 +391,7 @@ class Handler {
       if (this.airQualityService) {
         this.airQualityService
           .updateCharacteristic(this.api.hap.Characteristic.AirQuality, result.getAirQuality())
-          .updateCharacteristic(this.api.hap.Characteristic.PM2_5Density, result.getPM2_5())
+          .updateCharacteristic(this.api.hap.Characteristic.PM2_5Density, result.getPM2_5());
       }
 
       if (this.temperatureService) {
@@ -399,7 +399,10 @@ class Handler {
       }
 
       if (this.humidityService) {
-        this.humidityService.updateCharacteristic(this.api.hap.Characteristic.CurrentRelativeHumidity, result.getHumidity());
+        this.humidityService.updateCharacteristic(
+          this.api.hap.Characteristic.CurrentRelativeHumidity,
+          result.getHumidity()
+        );
       }
 
       // if (this.lightService) {
