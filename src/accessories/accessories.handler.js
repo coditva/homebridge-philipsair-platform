@@ -29,13 +29,13 @@ class Command {
     CHILD_LOCK_OFF: 0,
     CHILD_LOCK_ON: 1,
 
-    FAN_SPEED: 'D0310C',
-    FAN_SPEED_0: 0, // Sleep mode
+    FAN_SPEED: 'D0310D',
+    FAN_SPEED_0: 0,
     FAN_SPEED_1: 1,
     FAN_SPEED_2: 2,
-    FAN_SPEED_3: 3, // Medium
+    FAN_SPEED_3: 3,
     FAN_SPEED_4: 4,
-    FAN_SPEED_5: 5, // Turbo
+    FAN_SPEED_5: 5,
 
     AIR_QUALITY_IAQL: 'D03120',
     AIR_QUALITY_PM2_5: 'D03221',
@@ -85,16 +85,16 @@ class Command {
     this._isInteger = true;
 
     // Transform fan speed to mode where applicable
-    const transformed = {
-      [Command.constants.FAN_SPEED_0]: Command.constants.MODE_SLEEP,
+    const mode = {
+      [Command.constants.FAN_SPEED_0]: Command.constants.MODE_AUTO,
       [Command.constants.FAN_SPEED_1]: Command.constants.FAN_SPEED_1,
       [Command.constants.FAN_SPEED_2]: Command.constants.FAN_SPEED_2,
-      [Command.constants.FAN_SPEED_3]: Command.constants.MODE_MEDIUM,
+      [Command.constants.FAN_SPEED_3]: Command.constants.FAN_SPEED_3,
       [Command.constants.FAN_SPEED_4]: Command.constants.FAN_SPEED_4,
       [Command.constants.FAN_SPEED_5]: Command.constants.MODE_TURBO,
     }[state];
 
-    this._cmds.push(`${Command.constants.FAN_SPEED}=${transformed}`);
+    this._cmds.push(`${Command.constants.MODE}=${mode}`);
 
     return this;
   }
@@ -306,10 +306,17 @@ class Handler {
         5: Command.constants.FAN_SPEED_5,
       }[Math.ceil(value / divisor)];
 
-      this.purifierService.updateCharacteristic(
-        this.api.hap.Characteristic.TargetAirPurifierState,
-        this.api.hap.Characteristic.TargetAirPurifierState.MANUAL
-      );
+      if (speed === Command.constants.FAN_SPEED_0) {
+        this.purifierService.updateCharacteristic(
+          this.api.hap.Characteristic.TargetAirPurifierState,
+          this.api.hap.Characteristic.TargetAirPurifierState.AUTO
+        );
+      } else {
+        this.purifierService.updateCharacteristic(
+          this.api.hap.Characteristic.TargetAirPurifierState,
+          this.api.hap.Characteristic.TargetAirPurifierState.MANUAL
+        );
+      }
 
       const args = new Command(this.args).setFanSpeed(speed).getCommand();
 
@@ -396,7 +403,6 @@ class Handler {
         this.api.hap.Characteristic.TargetAirPurifierState,
         this.api.hap.Characteristic.TargetAirPurifierState.AUTO
       );
-      this.purifierService.updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, 0);
 
       logger.info(`Sleep Mode: ${state}`, this.accessory.displayName);
 
