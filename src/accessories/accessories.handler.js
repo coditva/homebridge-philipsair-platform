@@ -226,7 +226,7 @@ class Handler {
   //Air Purifier
   async setPurifierActive(state) {
     try {
-      const isActive = state === this.api.hap.Characteristic.Active.ACTIVE;
+      const isActive = state !== this.api.hap.Characteristic.Active.INACTIVE;
       const args = new Command(this.args)
         .setPower(isActive ? Command.constants.POWER_ON : Command.constants.POWER_OFF)
         .getCommand();
@@ -299,6 +299,11 @@ class Handler {
       logger.info(`Purifier Rotation Speed: ${value}`, this.accessory.displayName);
 
       if (speed === Command.constants.FAN_SPEED_0) {
+        this.purifierService.updateCharacteristic(
+          this.api.hap.Characteristic.CurrentAirPurifierState,
+          this.api.hap.Characteristic.CurrentAirPurifierState.INACTIVE
+        );
+
         await this.sendCMD(new Command(this.args).setPower(Command.constants.POWER_OFF).getCommand());
       } else {
         // Transform fan speed to mode where applicable
@@ -310,8 +315,19 @@ class Handler {
           [Command.constants.FAN_SPEED_5]: Command.constants.MODE_TURBO,
         }[value];
 
-        // await this.sendCMD(new Command(this.args).setPower(Command.constants.POWER_ON).getCommand());
-        await this.sendCMD((new Command(this.args)).setMode(mode).getCommand());
+        this.purifierService
+          .updateCharacteristic(
+            this.api.hap.Characteristic.CurrentAirPurifierState,
+            this.api.hap.Characteristic.CurrentAirPurifierState.PURIFYING_AIR
+          )
+          .updateCharacteristic(
+            this.api.hap.Characteristic.TargetAirPurifierState,
+            this.api.hap.Characteristic.TargetAirPurifierState.MANUAL
+          )
+          .updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, speedNumber * divisor);
+
+        await this.sendCMD(new Command(this.args).setPower(Command.constants.POWER_ON).getCommand());
+        await this.sendCMD(new Command(this.args).setMode(mode).getCommand());
       }
     } catch (err) {
       logger.warn('An error occured during changing purifier rotation speed!', this.accessory.displayName);
