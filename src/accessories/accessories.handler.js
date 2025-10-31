@@ -447,7 +447,7 @@ class Handler {
     this.preFilterService = this.accessory.getService('Pre Filter');
     this.hepaFilterService = this.accessory.getService('HEPA filter');
 
-    this.turboModeService = this.accessory.getService(this.api.hap.Service.Switch);
+    this.turboModeService = this.accessory.getService('Turbo Mode');
     // this.sleepModeService = this.accessory.getService('Sleep Mode');
 
     const args = [...this.args];

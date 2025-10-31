@@ -64,15 +64,23 @@ class Accessory {
       });
 
     {
-      this.turboModeSwitchService = this.accessory.getService(this.api.hap.Service.Switch);
+      this.turboModeService = this.accessory.getService('Turbo Mode');
 
-      if (!this.turboModeSwitchService) {
-        this.turboModeSwitchService = this.accessory.addService(this.api.hap.Service.Switch, 'Turbo Mode', 'switch');
+      if (!this.turboModeService) {
+        this.turboModeService = this.accessory.addService(this.api.hap.Service.Switch, 'Turbo Mode', 'Turbo Mode');
       }
 
-      this.turboModeSwitchService
+      if (!this.turboModeService.testCharacteristic(this.api.hap.Characteristic.Name)) {
+        this.turboModeService.addCharacteristic(this.api.hap.Characteristic.Name);
+      }
+
+      this.turboModeService
         .getCharacteristic(this.api.hap.Characteristic.On)
         .onSet(async (state) => await this.handler.setTurboMode(state));
+
+      this.turboModeService.getCharacteristic(this.api.hap.Characteristic.Name).onGet(() => {
+        return 'Turbo Mode';
+      });
     }
 
     //Service.AirQuality
