@@ -392,26 +392,17 @@ class Handler {
 
   async setTurboMode(state) {
     try {
-      const args = (new Command(this.args))
+      const args = new Command(this.args)
         .setMode(state ? Command.constants.MODE_TURBO : Command.constants.MODE_AUTO)
         .getCommand();
 
-      this.turboModeService.updateCharacteristic(
-        this.api.hap.Characteristic.On,
-        state
-      );
-      this.sleepModeService.updateCharacteristic(
-        this.api.hap.Characteristic.On,
-        false
-      );
+      this.turboModeService.updateCharacteristic(this.api.hap.Characteristic.On, state);
+      this.sleepModeService.updateCharacteristic(this.api.hap.Characteristic.On, false);
       this.purifierService.updateCharacteristic(
         this.api.hap.Characteristic.TargetAirPurifierState,
         this.api.hap.Characteristic.TargetAirPurifierState.AUTO
       );
-      this.purifierService.updateCharacteristic(
-        this.api.hap.Characteristic.RotationSpeed,
-        state ? 100 : 0
-      );
+      this.purifierService.updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, state ? 100 : 0);
 
       logger.info(`Turbo Mode: ${state}`, this.accessory.displayName);
 
@@ -424,26 +415,17 @@ class Handler {
 
   async setSleepMode(state) {
     try {
-      const args = (new Command(this.args))
+      const args = new Command(this.args)
         .setMode(state ? Command.constants.MODE_SLEEP : Command.constants.MODE_AUTO)
         .getCommand();
 
-      this.sleepModeService.updateCharacteristic(
-        this.api.hap.Characteristic.On,
-        state
-      );
-      this.turboModeService.updateCharacteristic(
-        this.api.hap.Characteristic.On,
-        false
-      );
+      this.sleepModeService.updateCharacteristic(this.api.hap.Characteristic.On, state);
+      this.turboModeService.updateCharacteristic(this.api.hap.Characteristic.On, false);
       this.purifierService.updateCharacteristic(
         this.api.hap.Characteristic.TargetAirPurifierState,
         this.api.hap.Characteristic.TargetAirPurifierState.AUTO
       );
-      this.purifierService.updateCharacteristic(
-        this.api.hap.Characteristic.RotationSpeed,
-        state ? 0 : 0
-      );
+      this.purifierService.updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, state ? 0 : 0);
 
       logger.info(`Sleep Mode: ${state}`, this.accessory.displayName);
 
