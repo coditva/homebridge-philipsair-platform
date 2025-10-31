@@ -397,7 +397,7 @@ class Handler {
         .getCommand();
 
       this.turboModeService.updateCharacteristic(this.api.hap.Characteristic.On, state);
-      this.sleepModeService.updateCharacteristic(this.api.hap.Characteristic.On, false);
+      // this.sleepModeService.updateCharacteristic(this.api.hap.Characteristic.On, false);
       this.purifierService.updateCharacteristic(
         this.api.hap.Characteristic.TargetAirPurifierState,
         this.api.hap.Characteristic.TargetAirPurifierState.AUTO
@@ -419,7 +419,7 @@ class Handler {
         .setMode(state ? Command.constants.MODE_SLEEP : Command.constants.MODE_AUTO)
         .getCommand();
 
-      this.sleepModeService.updateCharacteristic(this.api.hap.Characteristic.On, state);
+      // this.sleepModeService.updateCharacteristic(this.api.hap.Characteristic.On, state);
       this.turboModeService.updateCharacteristic(this.api.hap.Characteristic.On, false);
       this.purifierService.updateCharacteristic(
         this.api.hap.Characteristic.TargetAirPurifierState,
@@ -447,8 +447,8 @@ class Handler {
     this.preFilterService = this.accessory.getService('Pre Filter');
     this.hepaFilterService = this.accessory.getService('HEPA filter');
 
-    this.turboModeService = this.accessory.getService('Turbo Mode');
-    this.sleepModeService = this.accessory.getService('Sleep Mode');
+    this.turboModeService = this.accessory.getService(this.api.hap.Service.Switch);
+    // this.sleepModeService = this.accessory.getService('Sleep Mode');
 
     const args = [...this.args];
     args.push('status-observe', '-J');
@@ -553,12 +553,12 @@ class Handler {
         );
       }
 
-      if (this.sleepModeService) {
-        this.sleepModeService.updateCharacteristic(
-          this.api.hap.Characteristic.On,
-          result.getMode() === Result.constants.MODE_SLEEP
-        );
-      }
+      // if (this.sleepModeService) {
+      //   this.sleepModeService.updateCharacteristic(
+      //     this.api.hap.Characteristic.On,
+      //     result.getMode() === Result.constants.MODE_SLEEP
+      //   );
+      // }
     });
 
     this.airControl.stderr.on('data', (data) => {
