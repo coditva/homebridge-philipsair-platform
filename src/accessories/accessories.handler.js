@@ -263,16 +263,11 @@ class Handler {
   async setPurifierTargetState(state) {
     try {
       const isAuto = state == this.api.hap.Characteristic.TargetAirPurifierState.AUTO;
-
-      if (isAuto) {
-        this.purifierService
-          .updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, 0)
-          .updateCharacteristic(this.api.hap.Characteristic.TargetAirPurifierState, state);
-      }
-
       const args = new Command(this.args)
         .setMode(isAuto ? Command.constants.MODE_AUTO : Command.constants.MODE_MANUAL)
         .getCommand();
+
+      this.purifierService.updateCharacteristic(this.api.hap.Characteristic.TargetAirPurifierState, state);
 
       logger.info(`Purifier Mode: ${state}`, this.accessory.displayName);
 
