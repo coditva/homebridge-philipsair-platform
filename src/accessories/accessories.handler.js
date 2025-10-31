@@ -301,12 +301,10 @@ class Handler {
 
         cmd.setPower(Command.constants.POWER_OFF);
       } else {
-        this.purifierService
-          .updateCharacteristic(this.api.hap.Characteristic.Active, this.api.hap.Characteristic.Active.ACTIVE)
-          .updateCharacteristic(
-            this.api.hap.Characteristic.TargetAirPurifierState,
-            this.api.hap.Characteristic.TargetAirPurifierState.MANUAL
-          );
+        this.purifierService.updateCharacteristic(
+          this.api.hap.Characteristic.TargetAirPurifierState,
+          this.api.hap.Characteristic.TargetAirPurifierState.MANUAL
+        );
 
         // Transform fan speed to mode where applicable
         const mode = {
@@ -317,7 +315,7 @@ class Handler {
           [Command.constants.FAN_SPEED_5]: Command.constants.MODE_TURBO,
         }[value];
 
-        cmd.setPower(Command.constants.POWER_ON).setMode(mode);
+        cmd.setMode(mode);
       }
 
       logger.info(`Purifier Rotation Speed: ${value}`, this.accessory.displayName);
