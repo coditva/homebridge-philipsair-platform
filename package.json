@@ -1,7 +1,7 @@
 {
   "name": "@coditva/homebridge-philipsair-platform-ac4000",
   "displayName": "Homebridge Philips Air Platform AC4000",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "Homebridge plugin for philips air purifier AC4000 series.",
   "author": "coditva",
   "scripts": {
