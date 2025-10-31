@@ -63,37 +63,17 @@ class Accessory {
         minStep: 20, // 5 steps: 0, 20, 40, 60, 80, 100
       });
 
-    this.turboModeSwitchService = this.accessory.getService('Turbo Mode');
+    {
+      this.turboModeSwitchService = this.accessory.getService('Turbo Mode');
 
-    if (!this.turboModeSwitchService) {
-      this.turboModeSwitchService = this.accessory.addService(this.api.hap.Service.Switch, 'Turbo Mode', 'Turbo Mode');
+      if (!this.turboModeSwitchService) {
+        this.turboModeSwitchService = this.accessory.addService(this.api.hap.Service.Switch, 'Turbo Mode', 'switch');
+      }
+
+      this.turboModeSwitchService
+        .getCharacteristic(this.api.hap.Characteristic.On)
+        .onSet(async (state) => await this.handler.setTurboMode(state));
     }
-
-    if (!this.turboModeSwitchService.testCharacteristic(this.api.hap.Characteristic.Name)) {
-      this.turboModeSwitchService.addCharacteristic(this.api.hap.Characteristic.Name);
-    }
-
-    this.turboModeSwitchService.getCharacteristic(this.api.hap.Characteristic.Name).updateValue('Turbo Mode');
-
-    this.turboModeSwitchService
-      .getCharacteristic(this.api.hap.Characteristic.On)
-      .onSet(async (state) => await this.handler.setTurboMode(state));
-
-    this.sleepModeSwitchService = this.accessory.getService('Sleep Mode');
-
-    if (!this.sleepModeSwitchService) {
-      this.sleepModeSwitchService = this.accessory.addService(this.api.hap.Service.Switch, 'Sleep Mode', 'Sleep Mode');
-    }
-
-    if (!this.sleepModeSwitchService.testCharacteristic(this.api.hap.Characteristic.Name)) {
-      this.sleepModeSwitchService.addCharacteristic(this.api.hap.Characteristic.Name);
-    }
-
-    this.sleepModeSwitchService.getCharacteristic(this.api.hap.Characteristic.Name).updateValue('Sleep Mode');
-
-    this.sleepModeSwitchService
-      .getCharacteristic(this.api.hap.Characteristic.On)
-      .onSet(async (state) => await this.handler.setSleepMode(state));
 
     //Service.AirQuality
     this.airQualityService = this.accessory.getService(this.api.hap.Service.AirQualitySensor);
