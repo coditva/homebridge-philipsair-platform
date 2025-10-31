@@ -64,7 +64,7 @@ class Accessory {
       });
 
     {
-      this.turboModeSwitchService = this.accessory.getService('Turbo Mode');
+      this.turboModeSwitchService = this.accessory.getService(this.api.hap.Service.Switch);
 
       if (!this.turboModeSwitchService) {
         this.turboModeSwitchService = this.accessory.addService(this.api.hap.Service.Switch, 'Turbo Mode', 'switch');
