@@ -296,10 +296,10 @@ class Handler {
         5: Command.constants.FAN_SPEED_5,
       }[speedNumber];
 
-      const cmd = new Command(this.args);
+      logger.info(`Purifier Rotation Speed: ${value}`, this.accessory.displayName);
 
       if (speed === Command.constants.FAN_SPEED_0) {
-        cmd.setPower(Command.constants.POWER_OFF);
+        await this.sendCMD(new Command(this.args).setPower(Command.constants.POWER_OFF).getCommand());
       } else {
         // Transform fan speed to mode where applicable
         const mode = {
@@ -310,12 +310,9 @@ class Handler {
           [Command.constants.FAN_SPEED_5]: Command.constants.MODE_TURBO,
         }[value];
 
-        cmd.setMode(mode);
+        await this.sendCMD(new Command(this.args).setPower(Command.constants.POWER_ON).getCommand());
+        await this.sendCMD(new Command(this.args).setMode(mode).getCommand());
       }
-
-      logger.info(`Purifier Rotation Speed: ${value}`, this.accessory.displayName);
-
-      await this.sendCMD(cmd.getCommand());
     } catch (err) {
       logger.warn('An error occured during changing purifier rotation speed!', this.accessory.displayName);
       logger.error(err, this.accessory.displayName);
