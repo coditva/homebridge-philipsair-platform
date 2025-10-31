@@ -299,20 +299,8 @@ class Handler {
       const cmd = new Command(this.args);
 
       if (speed === Command.constants.FAN_SPEED_0) {
-        this.purifierService.updateCharacteristic(
-          this.api.hap.Characteristic.Active,
-          this.api.hap.Characteristic.Active.INACTIVE
-        );
-
         cmd.setPower(Command.constants.POWER_OFF);
       } else {
-        this.purifierService
-          .updateCharacteristic(
-            this.api.hap.Characteristic.TargetAirPurifierState,
-            this.api.hap.Characteristic.TargetAirPurifierState.MANUAL
-          )
-          .updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, speedNumber * divisor);
-
         // Transform fan speed to mode where applicable
         const mode = {
           [Command.constants.FAN_SPEED_1]: Command.constants.MODE_MANUAL_1,
