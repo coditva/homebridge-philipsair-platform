@@ -291,7 +291,7 @@ class Handler {
         5: Command.constants.FAN_SPEED_5,
       }[Math.ceil(value / divisor)];
 
-      const args = new Command(this.args);
+      const cmd = new Command(this.args);
 
       if (speed === Command.constants.FAN_SPEED_0) {
         this.purifierService.updateCharacteristic(
@@ -299,7 +299,7 @@ class Handler {
           this.api.hap.Characteristic.Active.INACTIVE
         );
 
-        args.setPower(Command.constants.POWER_OFF);
+        cmd.setPower(Command.constants.POWER_OFF);
       } else {
         this.purifierService
           .updateCharacteristic(this.api.hap.Characteristic.Active, this.api.hap.Characteristic.Active.ACTIVE)
@@ -317,12 +317,12 @@ class Handler {
           [Command.constants.FAN_SPEED_5]: Command.constants.MODE_TURBO,
         }[value];
 
-        args.setPower(Command.constants.POWER_ON).setMode(mode);
+        cmd.setPower(Command.constants.POWER_ON).setMode(mode);
       }
 
       logger.info(`Purifier Rotation Speed: ${value}`, this.accessory.displayName);
 
-      await this.sendCMD(args);
+      await this.sendCMD(cmd.getCommand());
     } catch (err) {
       logger.warn('An error occured during changing purifier rotation speed!', this.accessory.displayName);
       logger.error(err, this.accessory.displayName);
