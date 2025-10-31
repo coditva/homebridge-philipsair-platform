@@ -8,7 +8,6 @@ const logger = require('../utils/logger');
 class Command {
   constructor(initialArgs) {
     this._cmds = [];
-    this._isInteger = false;
 
     this.initialArgs = initialArgs || [];
   }
@@ -65,42 +64,37 @@ class Command {
   };
 
   setPower(state) {
-    this._isInteger = true;
     this._cmds.push(`${Command.constants.POWER}=${state}`);
 
     return this;
   }
 
   setMode(state) {
-    this._isInteger = true;
     this._cmds.push(`${Command.constants.MODE}=${state}`);
 
     return this;
   }
 
   setChildLock(state) {
-    this._isInteger = true;
     this._cmds.push(`${Command.constants.CHILD_LOCK}=${state}`);
 
     return this;
   }
 
   setLampMode(state) {
-    this._isInteger = true;
     this._cmds.push(`${Command.constants.LAMP_MODE}=${state}`);
 
     return this;
   }
 
   setLampBrightness(state) {
-    this._isInteger = true;
     this._cmds.push(`${Command.constants.LAMP_BRIGHTNESS}=${state}`);
 
     return this;
   }
 
   getCommand() {
-    return [...this.initialArgs, 'set', this._isInteger ? '-I' : '', ...this._cmds];
+    return [...this.initialArgs, 'set', '-I', ...this._cmds];
   }
 }
 
@@ -326,8 +320,11 @@ class Handler {
           )
           .updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, speedNumber * divisor);
 
-        await this.sendCMD(new Command(this.args).setPower(Command.constants.POWER_ON).getCommand());
-        await this.sendCMD(new Command(this.args).setMode(mode).getCommand());
+        const cmd = new Command(this.args).setMode(mode).getCommand();
+
+        logger.info(`Purifier Mode: ${mode}`, this.accessory.displayName);
+
+        await this.sendCMD(cmd);
       }
     } catch (err) {
       logger.warn('An error occured during changing purifier rotation speed!', this.accessory.displayName);
