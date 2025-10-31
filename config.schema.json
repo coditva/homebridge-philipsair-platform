@@ -100,11 +100,6 @@
                 "functionBody": "try { return model.devices[arrayIndices[0]].active } catch(e){ return false }"
               }
             },
-            "humidifier": {
-              "title": "Humidifier",
-              "type": "boolean",
-              "description": "Expose a separate humidifier accessory to HomeKit."
-            },
             "light": {
               "title": "Light",
               "type": "boolean",
