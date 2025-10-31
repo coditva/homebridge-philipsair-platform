@@ -286,7 +286,7 @@ class Handler {
   async setPurifierRotationSpeed(value) {
     try {
       const divisor = 20;
-      const speedNumber = Math.ceil(100 / divisor);
+      const speedNumber = Math.ceil(value / divisor);
       const speed = {
         0: Command.constants.FAN_SPEED_0,
         1: Command.constants.FAN_SPEED_1,
@@ -310,7 +310,7 @@ class Handler {
           [Command.constants.FAN_SPEED_5]: Command.constants.MODE_TURBO,
         }[value];
 
-        await this.sendCMD(new Command(this.args).setPower(Command.constants.POWER_ON).getCommand());
+        // await this.sendCMD(new Command(this.args).setPower(Command.constants.POWER_ON).getCommand());
         await this.sendCMD(new Command(this.args).setMode(mode).getCommand());
       }
     } catch (err) {
