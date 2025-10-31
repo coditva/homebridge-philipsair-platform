@@ -20,7 +20,11 @@ class Command {
 
     MODE: 'D0310C',
     MODE_AUTO: 0,
-    MODE_MANUAL: 1,
+    MODE_MANUAL_1: 1,
+    MODE_MANUAL_2: 2,
+    MODE_MANUAL_3: 3,
+    MODE_MANUAL_4: 4,
+    MODE_MANUAL_5: 5,
     MODE_SLEEP: 17,
     MODE_TURBO: 18,
     MODE_MEDIUM: 19,
@@ -247,7 +251,7 @@ class Handler {
       if (state == this.api.hap.Characteristic.TargetAirPurifierState.MANUAL) {
         const fanSpeed = this.purifierService.getCharacteristic(this.api.hap.Characteristic.RotationSpeed).value;
 
-        return this.setPurifierRotationSpeed(fanSpeed);
+        return this.setPurifierRotationSpeed(fanSpeed ? fanSpeed : 100);
       }
 
       const args = new Command(this.args).setMode(Command.constants.MODE_AUTO).getCommand();
@@ -282,6 +286,7 @@ class Handler {
   async setPurifierRotationSpeed(value) {
     try {
       const divisor = 20;
+      const speedNumber = Math.ceil(100 / divisor);
       const speed = {
         0: Command.constants.FAN_SPEED_0,
         1: Command.constants.FAN_SPEED_1,
@@ -289,7 +294,7 @@ class Handler {
         3: Command.constants.FAN_SPEED_3,
         4: Command.constants.FAN_SPEED_4,
         5: Command.constants.FAN_SPEED_5,
-      }[Math.ceil(value / divisor)];
+      }[speedNumber];
 
       const cmd = new Command(this.args);
 
@@ -301,17 +306,19 @@ class Handler {
 
         cmd.setPower(Command.constants.POWER_OFF);
       } else {
-        this.purifierService.updateCharacteristic(
-          this.api.hap.Characteristic.TargetAirPurifierState,
-          this.api.hap.Characteristic.TargetAirPurifierState.MANUAL
-        );
+        this.purifierService
+          .updateCharacteristic(
+            this.api.hap.Characteristic.TargetAirPurifierState,
+            this.api.hap.Characteristic.TargetAirPurifierState.MANUAL
+          )
+          .updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, speedNumber * divisor);
 
         // Transform fan speed to mode where applicable
         const mode = {
-          [Command.constants.FAN_SPEED_1]: Command.constants.FAN_SPEED_1,
-          [Command.constants.FAN_SPEED_2]: Command.constants.FAN_SPEED_2,
-          [Command.constants.FAN_SPEED_3]: Command.constants.FAN_SPEED_3,
-          [Command.constants.FAN_SPEED_4]: Command.constants.FAN_SPEED_4,
+          [Command.constants.FAN_SPEED_1]: Command.constants.MODE_MANUAL_1,
+          [Command.constants.FAN_SPEED_2]: Command.constants.MODE_MANUAL_2,
+          [Command.constants.FAN_SPEED_3]: Command.constants.MODE_MANUAL_3,
+          [Command.constants.FAN_SPEED_4]: Command.constants.MODE_MANUAL_4,
           [Command.constants.FAN_SPEED_5]: Command.constants.MODE_TURBO,
         }[value];
 
