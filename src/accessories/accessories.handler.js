@@ -390,42 +390,18 @@ class Handler {
     this.settingBrightess = false;
   }
 
-  async setTurboMode(state) {
-    try {
-      const args = new Command(this.args)
-        .setMode(state ? Command.constants.MODE_TURBO : Command.constants.MODE_AUTO)
-        .getCommand();
-
-      this.turboModeService.updateCharacteristic(this.api.hap.Characteristic.On, state);
-      // this.sleepModeService.updateCharacteristic(this.api.hap.Characteristic.On, false);
-      this.purifierService.updateCharacteristic(
-        this.api.hap.Characteristic.TargetAirPurifierState,
-        this.api.hap.Characteristic.TargetAirPurifierState.AUTO
-      );
-      this.purifierService.updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, state ? 100 : 0);
-
-      logger.info(`Turbo Mode: ${state}`, this.accessory.displayName);
-
-      await this.sendCMD(args);
-    } catch (err) {
-      logger.warn('An error occured during changing turbo mode!', this.accessory.displayName);
-      logger.error(err, this.accessory.displayName);
-    }
-  }
-
   async setSleepMode(state) {
     try {
       const args = new Command(this.args)
         .setMode(state ? Command.constants.MODE_SLEEP : Command.constants.MODE_AUTO)
         .getCommand();
 
-      // this.sleepModeService.updateCharacteristic(this.api.hap.Characteristic.On, state);
-      this.turboModeService.updateCharacteristic(this.api.hap.Characteristic.On, false);
+      this.sleepModeService.updateCharacteristic(this.api.hap.Characteristic.On, state);
       this.purifierService.updateCharacteristic(
         this.api.hap.Characteristic.TargetAirPurifierState,
         this.api.hap.Characteristic.TargetAirPurifierState.AUTO
       );
-      this.purifierService.updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, state ? 0 : 0);
+      this.purifierService.updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, 0);
 
       logger.info(`Sleep Mode: ${state}`, this.accessory.displayName);
 
@@ -447,8 +423,7 @@ class Handler {
     this.preFilterService = this.accessory.getService('Pre Filter');
     this.hepaFilterService = this.accessory.getService('HEPA filter');
 
-    this.turboModeService = this.accessory.getService('Turbo Mode');
-    // this.sleepModeService = this.accessory.getService('Sleep Mode');
+    this.sleepModeService = this.accessory.getService('Sleep Mode');
 
     const args = [...this.args];
     args.push('status-observe', '-J');
@@ -546,22 +521,12 @@ class Handler {
           .updateCharacteristic(this.api.hap.Characteristic.FilterLifeLevel, fltsts1life);
       }
 
-      if (this.turboModeService) {
-        this.turboModeService.updateCharacteristic(
+      if (this.sleepModeService) {
+        this.sleepModeService.updateCharacteristic(
           this.api.hap.Characteristic.On,
-          result.getMode() === Result.constants.MODE_TURBO
+          result.getMode() === Result.constants.MODE_SLEEP
         );
-
-        // This seems wrong
-        this.turboModeService.updateCharacteristic(this.api.hap.Characteristic.Name, 'Turbo Mode');
       }
-
-      // if (this.sleepModeService) {
-      //   this.sleepModeService.updateCharacteristic(
-      //     this.api.hap.Characteristic.On,
-      //     result.getMode() === Result.constants.MODE_SLEEP
-      //   );
-      // }
     });
 
     this.airControl.stderr.on('data', (data) => {

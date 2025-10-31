@@ -64,21 +64,21 @@ class Accessory {
       });
 
     {
-      this.turboModeService = this.accessory.getService('Turbo Mode');
+      this.sleepModeService = this.accessory.getService('Sleep Mode');
 
-      if (!this.turboModeService) {
-        this.turboModeService = this.accessory.addService(this.api.hap.Service.Switch, 'Turbo Mode', 'Turbo Mode');
+      if (!this.sleepModeService) {
+        this.sleepModeService = this.accessory.addService(this.api.hap.Service.Switch, 'Sleep Mode', 'Sleep Mode');
       }
 
-      if (!this.turboModeService.testCharacteristic(this.api.hap.Characteristic.Name)) {
-        this.turboModeService.addCharacteristic(this.api.hap.Characteristic.Name);
+      if (!this.sleepModeService.testCharacteristic(this.api.hap.Characteristic.Name)) {
+        this.sleepModeService.addCharacteristic(this.api.hap.Characteristic.Name);
       }
 
-      this.turboModeService
+      this.sleepModeService
         .getCharacteristic(this.api.hap.Characteristic.On)
-        .onSet(async (state) => await this.handler.setTurboMode(state));
+        .onSet(async (state) => await this.handler.setSleepMode(state));
 
-      this.turboModeService.getCharacteristic(this.api.hap.Characteristic.Name).updateValue('Turbo Mode');
+      this.sleepModeService.getCharacteristic(this.api.hap.Characteristic.Name).updateValue('Sleep Mode');
     }
 
     //Service.AirQuality
