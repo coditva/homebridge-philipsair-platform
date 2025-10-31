@@ -83,6 +83,12 @@ class Accessory {
       });
     }
 
+    this.sleepModeService = this.accessory.getService('Sleep Mode');
+
+    if (this.sleepModeService) {
+      this.accessory.removeService(this.sleepModeService);
+    }
+
     //Service.AirQuality
     this.airQualityService = this.accessory.getService(this.api.hap.Service.AirQualitySensor);
 
