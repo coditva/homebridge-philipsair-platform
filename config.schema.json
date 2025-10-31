@@ -115,15 +115,10 @@
               "type": "boolean",
               "description": "Expose device humidity as humidity sensor to HomeKit."
             },
-            "sleepSpeed": {
-              "title": "Sleep Speed",
+            "sleepMode": {
+              "title": "Sleep Mode",
               "type": "boolean",
-              "description": "Does this device support 'sleep' speed?"
-            },
-            "allergicFunc": {
-              "title": "Allergic mode function",
-              "type": "boolean",
-              "description": "Does this device support 'allergic' function?"
+              "description": "Does this device support 'sleep' mode?"
             }
           }
         }
@@ -177,18 +172,7 @@
               "condition": {
                 "functionBody": "try { return model.devices[arrayIndices[0]].active } catch(e){ return false }"
               },
-              "items": ["devices[].humidifier", "devices[].light", "devices[].temperature", "devices[].humidity"]
-            },
-            {
-              "key": "devices[]",
-              "type": "section",
-              "title": "Extras",
-              "expandable": true,
-              "expanded": false,
-              "condition": {
-                "functionBody": "try { return model.devices[arrayIndices[0]].active } catch(e){ return false }"
-              },
-              "items": ["devices[].sleepSpeed", "devices[].allergicFunc"]
+              "items": ["devices[].light", "devices[].temperature", "devices[].humidity", "devices[].sleepMode"]
             }
           ]
         }

@@ -63,7 +63,8 @@ class Accessory {
         minStep: 20, // 5 steps: 0, 20, 40, 60, 80, 100
       });
 
-    {
+    //Service.SleepMode
+    if (this.accessory.context.config.sleepMode) {
       this.sleepModeService = this.accessory.getService('Sleep Mode');
 
       if (!this.sleepModeService) {
@@ -79,6 +80,11 @@ class Accessory {
         .onSet(async (state) => await this.handler.setSleepMode(state));
 
       this.sleepModeService.getCharacteristic(this.api.hap.Characteristic.Name).updateValue('Sleep Mode');
+    } else {
+      const service = this.accessory.getService('Sleep Mode');
+      if (service) {
+        this.accessory.removeService(service);
+      }
     }
 
     //Service.AirQuality
