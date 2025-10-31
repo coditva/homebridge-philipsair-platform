@@ -63,6 +63,24 @@ class Accessory {
         minStep: 20, // 5 steps: 0, 20, 40, 60, 80, 100
       });
 
+    if (!this.accessory.getService('Turbo Mode')) {
+      this.accessory.addService(this.api.hap.Service.Switch, 'Turbo Mode', 'Turbo Mode');
+
+      this.accessory
+        .getService('Turbo Mode')
+        .getCharacteristic(this.api.hap.Characteristic.On)
+        .onSet(async (state) => await this.handler.setTurboMode(state));
+    }
+
+    if (!this.accessory.getService('Sleep Mode')) {
+      this.accessory.addService(this.api.hap.Service.Switch, 'Sleep Mode', 'Sleep Mode');
+
+      this.accessory
+        .getService('Sleep Mode')
+        .getCharacteristic(this.api.hap.Characteristic.On)
+        .onSet(async (state) => await this.handler.setSleepMode(state));
+    }
+
     //Service.AirQuality
     this.airQualityService = this.accessory.getService(this.api.hap.Service.AirQualitySensor);
 

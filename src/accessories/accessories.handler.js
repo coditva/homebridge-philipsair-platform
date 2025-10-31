@@ -390,6 +390,70 @@ class Handler {
     this.settingBrightess = false;
   }
 
+  async setTurboMode(state) {
+    try {
+      const args = (new Command(this.args))
+        .setMode(state ? Command.constants.MODE_TURBO : Command.constants.MODE_AUTO)
+        .getCommand();
+
+      this.turboModeService.updateCharacteristic(
+        this.api.hap.Characteristic.On,
+        state
+      );
+      this.sleepModeService.updateCharacteristic(
+        this.api.hap.Characteristic.On,
+        false
+      );
+      this.purifierService.updateCharacteristic(
+        this.api.hap.Characteristic.TargetAirPurifierState,
+        this.api.hap.Characteristic.TargetAirPurifierState.AUTO
+      );
+      this.purifierService.updateCharacteristic(
+        this.api.hap.Characteristic.RotationSpeed,
+        state ? 100 : 0
+      );
+
+      logger.info(`Turbo Mode: ${state}`, this.accessory.displayName);
+
+      await this.sendCMD(args);
+    } catch (err) {
+      logger.warn('An error occured during changing turbo mode!', this.accessory.displayName);
+      logger.error(err, this.accessory.displayName);
+    }
+  }
+
+  async setSleepMode(state) {
+    try {
+      const args = (new Command(this.args))
+        .setMode(state ? Command.constants.MODE_SLEEP : Command.constants.MODE_AUTO)
+        .getCommand();
+
+      this.sleepModeService.updateCharacteristic(
+        this.api.hap.Characteristic.On,
+        state
+      );
+      this.turboModeService.updateCharacteristic(
+        this.api.hap.Characteristic.On,
+        false
+      );
+      this.purifierService.updateCharacteristic(
+        this.api.hap.Characteristic.TargetAirPurifierState,
+        this.api.hap.Characteristic.TargetAirPurifierState.AUTO
+      );
+      this.purifierService.updateCharacteristic(
+        this.api.hap.Characteristic.RotationSpeed,
+        state ? 0 : 0
+      );
+
+      logger.info(`Sleep Mode: ${state}`, this.accessory.displayName);
+
+      await this.sendCMD(args);
+    } catch (err) {
+      logger.warn('An error occured during changing sleep mode!', this.accessory.displayName);
+      logger.error(err, this.accessory.displayName);
+    }
+  }
+
   //Longpoll Process
   longPoll() {
     this.purifierService = this.accessory.getService(this.api.hap.Service.AirPurifier);
@@ -400,6 +464,9 @@ class Handler {
     this.airQualityService = this.accessory.getService('Air Quality');
     this.preFilterService = this.accessory.getService('Pre Filter');
     this.hepaFilterService = this.accessory.getService('HEPA filter');
+
+    this.turboModeService = this.accessory.getService('Turbo Mode');
+    this.sleepModeService = this.accessory.getService('Sleep Mode');
 
     const args = [...this.args];
     args.push('status-observe', '-J');
@@ -495,6 +562,20 @@ class Handler {
         this.hepaFilterService
           .updateCharacteristic(this.api.hap.Characteristic.FilterChangeIndication, fltsts1change)
           .updateCharacteristic(this.api.hap.Characteristic.FilterLifeLevel, fltsts1life);
+      }
+
+      if (this.turboModeService) {
+        this.turboModeService.updateCharacteristic(
+          this.api.hap.Characteristic.On,
+          result.getMode() === Result.constants.MODE_TURBO
+        );
+      }
+
+      if (this.sleepModeService) {
+        this.sleepModeService.updateCharacteristic(
+          this.api.hap.Characteristic.On,
+          result.getMode() === Result.constants.MODE_SLEEP
+        );
       }
     });
 
