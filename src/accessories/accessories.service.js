@@ -69,7 +69,10 @@ class Accessory {
       this.turboModeSwitchService = this.accessory.addService(this.api.hap.Service.Switch, 'Turbo Mode', 'Turbo Mode');
     }
 
-    this.turboModeSwitchService.addCharacteristic(this.api.hap.Characteristic.Name);
+    if (!this.turboModeSwitchService.testCharacteristic(this.api.hap.Characteristic.Name)) {
+      this.turboModeSwitchService.addCharacteristic(this.api.hap.Characteristic.Name);
+    }
+
     this.turboModeSwitchService.setCharacteristic(this.api.hap.Characteristic.Name, 'Turbo Mode');
 
     this.turboModeSwitchService
@@ -82,7 +85,10 @@ class Accessory {
       this.sleepModeSwitchService = this.accessory.addService(this.api.hap.Service.Switch, 'Sleep Mode', 'Sleep Mode');
     }
 
-    this.sleepModeSwitchService.addCharacteristic(this.api.hap.Characteristic.Name);
+    if (!this.sleepModeSwitchService.testCharacteristic(this.api.hap.Characteristic.Name)) {
+      this.sleepModeSwitchService.addCharacteristic(this.api.hap.Characteristic.Name);
+    }
+
     this.sleepModeSwitchService.setCharacteristic(this.api.hap.Characteristic.Name, 'Sleep Mode');
 
     this.sleepModeSwitchService
