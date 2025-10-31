@@ -84,9 +84,12 @@ class Command {
   setFanSpeed(state) {
     this._isInteger = true;
 
+    if (state === Command.constants.FAN_SPEED_0) {
+      return this.setPower(Command.constants.POWER_OFF);
+    }
+
     // Transform fan speed to mode where applicable
     const mode = {
-      [Command.constants.FAN_SPEED_0]: Command.constants.MODE_AUTO,
       [Command.constants.FAN_SPEED_1]: Command.constants.FAN_SPEED_1,
       [Command.constants.FAN_SPEED_2]: Command.constants.FAN_SPEED_2,
       [Command.constants.FAN_SPEED_3]: Command.constants.FAN_SPEED_3,
@@ -308,8 +311,8 @@ class Handler {
 
       if (speed === Command.constants.FAN_SPEED_0) {
         this.purifierService.updateCharacteristic(
-          this.api.hap.Characteristic.TargetAirPurifierState,
-          this.api.hap.Characteristic.TargetAirPurifierState.AUTO
+          this.api.hap.Characteristic.Active,
+          this.api.hap.Characteristic.Active.INACTIVE
         );
       } else {
         this.purifierService.updateCharacteristic(
