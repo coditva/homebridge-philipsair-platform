@@ -307,7 +307,7 @@ class Handler {
           [Command.constants.FAN_SPEED_3]: Command.constants.MODE_MANUAL_3,
           [Command.constants.FAN_SPEED_4]: Command.constants.MODE_MANUAL_4,
           [Command.constants.FAN_SPEED_5]: Command.constants.MODE_TURBO,
-        }[value];
+        }[speed];
 
         this.purifierService
           .updateCharacteristic(
