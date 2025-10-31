@@ -311,7 +311,7 @@ class Handler {
         }[value];
 
         // await this.sendCMD(new Command(this.args).setPower(Command.constants.POWER_ON).getCommand());
-        await this.sendCMD(new Command(this.args).setMode(mode).getCommand());
+        await this.sendCMD((new Command(this.args)).setMode(mode).getCommand());
       }
     } catch (err) {
       logger.warn('An error occured during changing purifier rotation speed!', this.accessory.displayName);
