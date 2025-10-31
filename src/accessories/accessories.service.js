@@ -78,15 +78,7 @@ class Accessory {
         .getCharacteristic(this.api.hap.Characteristic.On)
         .onSet(async (state) => await this.handler.setTurboMode(state));
 
-      this.turboModeService.getCharacteristic(this.api.hap.Characteristic.Name).onGet(() => {
-        return 'Turbo Mode';
-      });
-    }
-
-    this.sleepModeService = this.accessory.getService('Sleep Mode');
-
-    if (this.sleepModeService) {
-      this.accessory.removeService(this.sleepModeService);
+      this.turboModeService.getCharacteristic(this.api.hap.Characteristic.Name).updateValue('Turbo Mode');
     }
 
     //Service.AirQuality

@@ -551,6 +551,9 @@ class Handler {
           this.api.hap.Characteristic.On,
           result.getMode() === Result.constants.MODE_TURBO
         );
+
+        // This seems wrong
+        this.turboModeService.updateCharacteristic(this.api.hap.Characteristic.Name, 'Turbo Mode');
       }
 
       // if (this.sleepModeService) {
