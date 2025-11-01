@@ -138,7 +138,9 @@ class Result {
   }
 
   getAirQuality() {
-    return Math.ceil(parseInt(this._data[Result.constants.AIR_QUALITY_IAQL]) / 3);
+    const normalisationFactor = 12 / 5; // HomeKit defines air quality levels from 1-5, while IAQL is from 1-12
+
+    return Math.ceil(parseInt(this._data[Result.constants.AIR_QUALITY_IAQL]) / normalisationFactor);
   }
 
   getPM2_5() {
